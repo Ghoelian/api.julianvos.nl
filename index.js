@@ -16,7 +16,7 @@ app.use(cookieParser())
 app.use(cors())
 
 const corsSettings = {
-  origin: 'https://julianvos.nl, https://songguesser.julianvos.nl',
+  origin: 'https://julianvos.nl',
   optionSuccessStatus: 200,
   methods: 'GET, POST'
 }
