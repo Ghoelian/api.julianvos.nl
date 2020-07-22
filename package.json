@@ -1,0 +1,43 @@
+{
+  "name": "songguesser.julianvos.nl",
+  "version": "1.0.0",
+  "description": "Song guesser game that uses your own Spotify playlists",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ghoelian/songguesser.julianvos.nl.git"
+  },
+  "keywords": [
+    "spotify",
+    "song",
+    "game",
+    "speed"
+  ],
+  "author": "Julian Vos",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ghoelian/songguesser.julianvos.nl/issues"
+  },
+  "homepage": "https://github.com/Ghoelian/songguesser.julianvos.nl#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "eslint": "^7.5.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
+  }
+}
