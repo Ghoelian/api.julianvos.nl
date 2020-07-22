@@ -15,9 +15,15 @@ app.use(bodyParser.urlencoded({
 app.use(cookieParser())
 app.use(cors())
 
-app.options('*', cors())
+const corsSettings = {
+  origin: 'https://julianvos.nl, https://songguesser.julianvos.nl',
+  optionSuccessStatus: 200,
+  methods: 'GET, POST'
+}
 
-app.post('/songguesser', (req, res) => {
+app.options('*', cors(corsSettings))
+
+app.post('/songguesser', cors(corsSettings), (req, res) => {
   if (req.body.spotify_user_authorization !== 'null' && req.body.spotify_user_access !== 'null' && req.body.spotify_user_refresh_token !== 'null') {
     spotify.getUserDetails(req, (err, data) => {
       if (err) throw err
@@ -46,7 +52,7 @@ app.post('/songguesser', (req, res) => {
   }
 })
 
-app.post('/songguesser/play', (req, res) => {
+app.post('/songguesser/play', cors(corsSettings), (req, res) => {
   const result = {}
 
   spotify.getPlaylistSongs(req, (err, data) => {
@@ -67,7 +73,7 @@ app.post('/songguesser/play', (req, res) => {
   })
 })
 
-app.get('/songguesser/login', (req, res) => {
+app.get('/songguesser/login', cors(corsSettings), (req, res) => {
   const result = {}
   const state = uuidv4()
   result.state = state
@@ -79,7 +85,7 @@ app.get('/songguesser/login', (req, res) => {
   res.end()
 })
 
-app.get('/songguesser/auth', (req, res) => {
+app.get('/songguesser/auth', cors(corsSettings), (req, res) => {
   spotify.authenticateUser(req, req.query.state, (err, result) => {
     if (err) throw err
     const response = {}
