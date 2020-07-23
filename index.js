@@ -13,13 +13,14 @@ app.use(bodyParser.urlencoded({
   extended: true
 }))
 app.use(cookieParser())
-app.use(cors())
 
 const corsSettings = {
   origin: process.env.CORS_ORIGIN,
   optionSuccessStatus: 200,
   methods: 'GET, POST'
 }
+
+app.use(cors(corsSettings))
 
 app.options('*', cors(corsSettings))
 
