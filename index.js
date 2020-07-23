@@ -25,7 +25,7 @@ app.use(cors(corsSettings))
 app.options('*', cors(corsSettings))
 
 app.post('/songguesser', cors(corsSettings), (req, res) => {
-  if ((req.body.spotify_user_authorization !== 'undefined' && req.body.spotify_user_access !== 'undefined' && req.body.spotify_user_refresh_token !== 'undefined') && (typeof req.body.spotify_user_authorization !== 'undefined' && typeof req.body.spotify_user_access !== 'undefined' && typeof req.body.spotify_user_refresh_token !== 'undefined')) {
+  if ((req.body.spotify_user_authorization !== 'null' && req.body.spotify_user_access !== 'null' && req.body.spotify_user_refresh_token !== 'null') && (typeof req.body.spotify_user_authorization !== 'undefined' && typeof req.body.spotify_user_access !== 'undefined' && typeof req.body.spotify_user_refresh_token !== 'undefined')) {
     spotify.getUserDetails(req, (err, data) => {
       if (err) throw err
       const result = {}
