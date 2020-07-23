@@ -16,7 +16,7 @@ app.use(cookieParser())
 app.use(cors())
 
 const corsSettings = {
-  origin: 'https://songguesser.julianvos.nl',
+  origin: process.env.CORS_ORIGIN,
   optionSuccessStatus: 200,
   methods: 'GET, POST'
 }
@@ -91,11 +91,9 @@ app.get('/songguesser/auth', cors(corsSettings), (req, res) => {
     const response = {}
 
     response.SPOTIFY_USER_AUTHORIZATION = result.SPOTIFY_USER_AUTHORIZATION
-    response.SPOTIFY_USER_AUTHORIZATION_DATE = result.SPOTIFY_USER_AUTHORIZATION_DATE
     response.SPOTIFY_USER_ACCESS = result.SPOTIFY_USER_ACCESS
     response.SPOTIFY_USER_ACCESS_EXPIRES_IN = result.SPOTIFY_USER_ACCESS_EXPIRES_IN
     response.SPOTIFY_USER_REFRESH_TOKEN = result.SPOTIFY_USER_REFRESH_TOKEN
-
     res.write(JSON.stringify(response))
     res.end()
   })
