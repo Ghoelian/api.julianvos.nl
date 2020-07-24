@@ -6,9 +6,9 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const uuidv4 = require('uuid/v4')
 
-require('dotenv').config()
+require('dotenv').config() // Load the .env file that should be put in the root of this project. See README.md for variables to include
 
-app.set('trust proxy', 1)
+app.set('trust proxy', 1) // Treat proxy as direct connection, as I use NGINX on my server.
 app.use(bodyParser.urlencoded({
   extended: true
 }))
@@ -20,7 +20,7 @@ const corsSettings = {
   methods: 'GET, POST'
 }
 
-app.use(cors(corsSettings))
+app.use(cors(corsSettings)) // Apply CORS settings to all requests.
 
 app.options('*', cors(corsSettings))
 
