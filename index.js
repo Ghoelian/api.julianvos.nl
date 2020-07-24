@@ -27,13 +27,19 @@ app.options('*', cors(corsSettings))
 app.post('/songguesser', cors(corsSettings), (req, res) => {
   if ((req.body.spotify_user_authorization !== 'null' && req.body.spotify_user_access !== 'null' && req.body.spotify_user_refresh_token !== 'null') && (typeof req.body.spotify_user_authorization !== 'undefined' && typeof req.body.spotify_user_access !== 'undefined' && typeof req.body.spotify_user_refresh_token !== 'undefined') && (req.body.spotify_user_authorization !== 'undefined' && req.body.spotify_user_access !== 'undefined' && req.body.spotify_user_refresh_token !== 'undefined')) {
     spotify.getUserDetails(req, (err, data) => {
-      if (err) throw err
+      if (err) {
+        res.status(401).end()
+        return
+      }
       const result = {}
 
       result.username = data
 
       spotify.getUserPlaylists(req, (err, data) => {
-        if (err) throw err
+        if (err) {
+          res.status(401).end()
+          return
+        }
 
         result.data = []
 
@@ -57,10 +63,9 @@ app.post('/songguesser/play', cors(corsSettings), (req, res) => {
   const result = {}
 
   spotify.getPlaylistSongs(req, (err, data) => {
-    if (err === 1) {
+    if (err) {
       res.status(401).end()
-    } else if (err) {
-      throw err
+      return
     }
 
     result.songs = []
@@ -83,12 +88,15 @@ app.get('/songguesser/login', cors(corsSettings), (req, res) => {
 
   res.write(JSON.stringify(result))
 
-  res.end()
+  res.status(200).end()
 })
 
 app.get('/songguesser/auth', cors(corsSettings), (req, res) => {
   spotify.authenticateUser(req, req.query.state, (err, result) => {
-    if (err) throw err
+    if (err) {
+      res.status(401).end()
+      return
+    }
     const response = {}
 
     response.SPOTIFY_USER_AUTHORIZATION = result.SPOTIFY_USER_AUTHORIZATION
@@ -96,7 +104,7 @@ app.get('/songguesser/auth', cors(corsSettings), (req, res) => {
     response.SPOTIFY_USER_ACCESS_EXPIRES_IN = result.SPOTIFY_USER_ACCESS_EXPIRES_IN
     response.SPOTIFY_USER_REFRESH_TOKEN = result.SPOTIFY_USER_REFRESH_TOKEN
     res.write(JSON.stringify(response))
-    res.end()
+    res.status(200).end()
   })
 })
 
