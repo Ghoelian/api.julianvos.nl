@@ -4,3 +4,5 @@ Eventually, I'll move my [URL "shortener"](https://github.com/Ghoelian/shortener
 
 # TODO:
 - Check response body for error messages for Spotify API calls
+- Use token refreshing instead of always requesting a new one
+- Refactor code to properly use resolve and reject, and their arguments
