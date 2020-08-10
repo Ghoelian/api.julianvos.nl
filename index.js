@@ -130,31 +130,32 @@ app.get('/songguesser/auth', cors(corsSettings), (req, res) => {
 })
 
 app.get('/redirect', cors(corsSettings), (req, res) => {
-  const destination = req.query.destination
-  const origin = req.query.origin
+  if (req.query.destination !== undefined) {
+    const destination = req.query.destination
+    const origin = req.query.origin
 
-  res.redirect(302, destination)
-  res.end()
+    res.redirect(302, destination)
+    res.end()
 
-  const ip = req.ip.substr(0, 7) === '::ffff:' ? req.ip.substr(7) : req.ip
+    const ip = req.ip.substr(0, 7) === '::ffff:' ? req.ip.substr(7) : req.ip
 
-  https.get(`https://ipinfo.io/${ip}/json?token=${process.env.IPINFO_TOKEN}`, (result) => {
-    result.on('data', (d) => {
-      result = JSON.parse(d.toString())
+    https.get(`https://ipinfo.io/${ip}/json?token=${process.env.IPINFO_TOKEN}`, (result) => {
+      result.on('data', (d) => {
+        result = JSON.parse(d.toString())
 
-      const city = result.city
-      const country = result.country
-      const region = result.region
+        const city = result.city
+        const country = result.country
+        const region = result.region
 
-      pool.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Date.now()}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err) => {
-        if (err) throw err
-      })
+        pool.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Date.now()}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err) => {
+          if (err) throw err
+        })
 
-      transporter.sendMail({
-        from: `"Julian Vos" <${process.env.SMTP_USER}>`,
-        to: process.env.SMTP_USER,
-        subject: `New click from ${origin}`,
-        html: `
+        transporter.sendMail({
+          from: `"Julian Vos" <${process.env.SMTP_USER}>`,
+          to: process.env.SMTP_USER,
+          subject: `New click from ${origin}`,
+          html: `
         <table>
           <tr>
             <td>IP:</td>
@@ -182,17 +183,46 @@ app.get('/redirect', cors(corsSettings), (req, res) => {
           </tr>
         </table>
         `
-      }, (err) => {
-        if (err) throw err
+        }, (err) => {
+          if (err) throw err
+        })
       })
+    }).on('error', (err) => {
+      throw err
     })
-  }).on('error', (err) => {
-    throw err
-  })
+  } else {
+    res.write(`
+    <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>Generate URL</title>
+      </head>
+      <body>
+        <h1>Create a new tracked URL</h1>
+        <form action="/redirect/generate" method="get">
+          <label for="origin">Source:</label><br/>
+          <input id="origin" name="origin" type="text"><br/>
+          <label for="destination">Destination:</label><br/>
+          <input id="destination" name="destination" type="text"><br/>
+          <input type="submit">
+        </form>
+        <footer>
+          <a href="https://julianvos.nl/privacy_policy">Privacy Policy</a><br/>
+          <a href="https://julianvos.nl/terms_of_service">Terms of Service</a>
+        </footer>
+      </body>
+      </html>
+    `)
+    res.send()
+    res.end()
+  }
 })
 
 app.get('/redirect/generate', cors(corsSettings), (req, res) => {
-
+  res.write(`https://api.julianvos.nl/redirect?destination=${encodeURIComponent(req.query.destination)}&origin=${encodeURIComponent(req.query.origin)}`)
+  res.send()
+  res.end()
 })
 
 const listener = app.listen(process.env.PORT, () => {
