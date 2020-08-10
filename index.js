@@ -5,8 +5,29 @@ const spotify = require('./lib/spotify_api')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const uuidv4 = require('uuid/v4')
+const https = require('https')
+const mysql = require('mysql')
+const mailer = require('nodemailer')
 
 require('dotenv').config() // Load the .env file that should be put in the root of this project. See README.md for variables to include
+
+const pool = mysql.createPool({
+  connectionLimit: 10,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB
+})
+
+const transporter = mailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+})
 
 app.set('trust proxy', 1) // Treat proxy as direct connection, as I use NGINX on my server.
 app.use(bodyParser.urlencoded({
@@ -106,6 +127,72 @@ app.get('/songguesser/auth', cors(corsSettings), (req, res) => {
     res.write(JSON.stringify(response))
     res.status(200).end()
   })
+})
+
+app.get('/redirect', cors(corsSettings), (req, res) => {
+  const destination = req.query.destination
+  const origin = req.query.origin
+
+  res.redirect(302, destination)
+  res.end()
+
+  const ip = req.ip.substr(0, 7) === '::ffff:' ? req.ip.substr(7) : req.ip
+
+  https.get(`https://ipinfo.io/${ip}/json?token=${process.env.IPINFO_TOKEN}`, (result) => {
+    result.on('data', (d) => {
+      result = JSON.parse(d.toString())
+
+      const city = result.city
+      const country = result.country
+      const region = result.region
+
+      pool.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Date.now()}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err) => {
+        if (err) throw err
+      })
+
+      transporter.sendMail({
+        from: `"Julian Vos" <${process.env.SMTP_USER}>`,
+        to: process.env.SMTP_USER,
+        subject: `New click from ${origin}`,
+        html: `
+        <table>
+          <tr>
+            <td>IP:</td>
+            <td>${ip}</td>
+          </tr>
+          <tr>
+            <td>Destination:</td>
+            <td>${destination}</td>
+          </tr>
+          <tr>
+            <td>Origin:</td>
+            <td>${origin}</td>
+          </tr>
+          <tr>
+            <td>City:</td>
+            <td>${city}</td>
+          </tr>
+          <tr>
+            <td>Region:</td>
+            <td>${region}</td>
+          </tr>
+          <tr>
+            <td>Country:</td>
+            <td>${country}</td>
+          </tr>
+        </table>
+        `
+      }, (err) => {
+        if (err) throw err
+      })
+    })
+  }).on('error', (err) => {
+    throw err
+  })
+})
+
+app.get('/redirect/generate', cors(corsSettings), (req, res) => {
+
 })
 
 const listener = app.listen(process.env.PORT, () => {
