@@ -1,5 +1,4 @@
 const express = require('express')
-const app = express()
 const cookieParser = require('cookie-parser')
 const spotify = require('./lib/spotify_api')
 const cors = require('cors')
@@ -7,7 +6,13 @@ const bodyParser = require('body-parser')
 const uuidv4 = require('uuid/v4')
 const https = require('https')
 const mysql = require('mysql')
-const mailer = require('nodemailer')
+const discord = require('discord.js')
+
+const app = express()
+const discordClient = new discord.Client()
+
+let notificationChannel
+let errorChannel
 
 require('dotenv').config() // Load the .env file that should be put in the root of this project. See README.md for variables to include
 
@@ -19,15 +24,12 @@ const pool = mysql.createPool({
   database: process.env.DB
 })
 
-const transporter = mailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
+discordClient.on('ready', () => {
+  notificationChannel = discordClient.channels.cache.find(channel => channel.name === 'notifications')
+  errorChannel = discordClient.channels.cache.find(channel => channel.name === 'errors')
 })
+
+discordClient.login(process.env.DISCORD_TOKEN)
 
 app.set('trust proxy', 1) // Treat proxy as direct connection, as I use NGINX on my server.
 app.use(bodyParser.urlencoded({
@@ -147,48 +149,31 @@ app.get('/redirect', cors(corsSettings), (req, res) => {
         const country = result.country
         const region = result.region
 
-        console.log(Math.floor(new Date() / 1000))
         pool.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Math.floor(new Date() / 1000)}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err) => {
           if (err) throw err
         })
 
-        transporter.sendMail({
-          from: `"Julian Vos" <${process.env.SMTP_USER}>`,
-          to: process.env.SMTP_USER,
-          subject: `New click from ${origin}`,
-          html: `
-        <table>
-          <tr>
-            <td>IP:</td>
-            <td>${ip}</td>
-          </tr>
-          <tr>
-            <td>Destination:</td>
-            <td>${destination}</td>
-          </tr>
-          <tr>
-            <td>Origin:</td>
-            <td>${origin}</td>
-          </tr>
-          <tr>
-            <td>City:</td>
-            <td>${city}</td>
-          </tr>
-          <tr>
-            <td>Region:</td>
-            <td>${region}</td>
-          </tr>
-          <tr>
-            <td>Country:</td>
-            <td>${country}</td>
-          </tr>
-        </table>
-        `
-        }, (err) => {
-          if (err) throw err
-        })
+        notificationChannel.send(new discord.MessageEmbed()
+          .setTitle(`New click from ${origin}`)
+          .setColor(0x00FF00)
+          .addFields(
+            { name: 'IP', value: ip },
+            { name: 'Destination', value: destination },
+            { name: 'Origin', value: origin },
+            { name: 'City', value: city },
+            { name: 'Region', value: region },
+            { name: 'Country', value: country }
+          ))
       })
     }).on('error', (err) => {
+      errorChannel.send(new discord.MessageEmbed()
+        .setTitle('Error')
+        .setColor(0xFF0000)
+        .addFields(
+          { name: 'Error', value: err }
+        )
+      )
+
       throw err
     })
   } else {
