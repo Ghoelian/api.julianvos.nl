@@ -147,7 +147,8 @@ app.get('/redirect', cors(corsSettings), (req, res) => {
         const country = result.country
         const region = result.region
 
-        pool.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Date.now()}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err) => {
+        console.log(Math.floor(new Date() / 1000))
+        pool.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Math.floor(new Date() / 1000)}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err) => {
           if (err) throw err
         })
 
