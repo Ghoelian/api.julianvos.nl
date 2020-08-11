@@ -1,18 +1,18 @@
-const express = require('express')
-const cookieParser = require('cookie-parser')
-const spotify = require('./lib/spotify_api')
-const cors = require('cors')
-const bodyParser = require('body-parser')
-const uuidv4 = require('uuid/v4')
-const https = require('https')
-const mysql = require('mysql')
-const discord = require('discord.js')
+import express = require('express')
+import cookieParser = require('cookie-parser')
+import spotify = require('./lib/spotify_api')
+import cors = require('cors')
+import bodyParser = require('body-parser')
+import uuidv4 = require('uuid/v4')
+import https = require('https')
+import mysql = require('mysql')
+import discord = require('discord.js')
 
 const app = express()
 const discordClient = new discord.Client()
 
-let notificationChannel
-let errorChannel
+let notificationChannel: any
+let errorChannel: any
 
 require('dotenv').config() // Load the .env file that should be put in the root of this project. See README.md for variables to include
 
@@ -25,8 +25,8 @@ const pool = mysql.createPool({
 })
 
 discordClient.on('ready', () => {
-  notificationChannel = discordClient.channels.cache.find(channel => channel.name === 'notifications')
-  errorChannel = discordClient.channels.cache.find(channel => channel.name === 'errors')
+  notificationChannel = discordClient.channels.cache.find(channel => channel['name'] === 'notifications')
+  errorChannel = discordClient.channels.cache.find(channel => channel['name'] === 'errors')
 })
 
 discordClient.login(process.env.DISCORD_TOKEN)
@@ -47,27 +47,27 @@ app.use(cors(corsSettings)) // Apply CORS settings to all requests.
 
 app.options('*', cors(corsSettings))
 
-app.post('/songguesser', cors(corsSettings), (req, res) => {
+app.post('/songguesser', cors(corsSettings), (req: { body: any }, res: { status: (arg0: number) => { (): any; new(): any; end: { (): void; new(): any } }; write: (arg0: string) => void }) => {
   if ((req.body.spotify_user_authorization !== 'null' && req.body.spotify_user_access !== 'null' && req.body.spotify_user_refresh_token !== 'null') && (typeof req.body.spotify_user_authorization !== 'undefined' && typeof req.body.spotify_user_access !== 'undefined' && typeof req.body.spotify_user_refresh_token !== 'undefined') && (req.body.spotify_user_authorization !== 'undefined' && req.body.spotify_user_access !== 'undefined' && req.body.spotify_user_refresh_token !== 'undefined')) {
-    spotify.getUserDetails(req, (err, data) => {
+    spotify.getUserDetails(req, (err: any, data: any) => {
       if (err) {
         res.status(401).end()
         return
       }
       const result = {}
 
-      result.username = data
+      result['username'] = data
 
-      spotify.getUserPlaylists(req, (err, data) => {
+      spotify.getUserPlaylists(req, (err: any, data: string | any[]) => {
         if (err) {
           res.status(401).end()
           return
         }
 
-        result.data = []
+        result['data'] = []
 
         for (let i = 0; i < data.length; i++) {
-          result.data.push({
+          result['data'].push({
             id: data[i].id,
             name: data[i].name
           })
@@ -82,19 +82,19 @@ app.post('/songguesser', cors(corsSettings), (req, res) => {
   }
 })
 
-app.post('/songguesser/play', cors(corsSettings), (req, res) => {
+app.post('/songguesser/play', cors(corsSettings), (req: { query: { playlist: any }; body: { spotify_user_access: any } }, res: { status: (arg0: number) => { (): any; new(): any; end: { (): void; new(): any } }; write: (arg0: string) => void }) => {
   const result = {}
 
-  spotify.getPlaylistSongs(req, (err, data) => {
+  spotify.getPlaylistSongs(req, (err: any, data: string | any[]) => {
     if (err) {
       res.status(401).end()
       return
     }
 
-    result.songs = []
+    result['songs'] = []
 
     for (let i = 0; i < data.length; i++) {
-      result.songs.push(data[i].track)
+      result['songs'].push(data[i].track)
     }
 
     res.write(JSON.stringify(result))
@@ -102,36 +102,36 @@ app.post('/songguesser/play', cors(corsSettings), (req, res) => {
   })
 })
 
-app.get('/songguesser/login', cors(corsSettings), (req, res) => {
+app.get('/songguesser/login', cors(corsSettings), (req: any, res: { write: (arg0: string) => void; status: (arg0: number) => { (): any; new(): any; end: { (): void; new(): any } } }) => {
   const result = {}
   const state = uuidv4()
-  result.state = state
+  result['state'] = state
   const scopes = 'streaming playlist-read-collaborative playlist-read-private user-library-read user-read-email user-read-private user-read-playback-state'
-  result.redirect = `https://accounts.spotify.com/authorize?response_type=code&client_id=${process.env.SPOTIFY_API_ID}${(scopes ? '&scope=' + encodeURIComponent(scopes) : '')}&state=${state}&redirect_uri=${process.env.REDIRECT_URI}`
+  result['redirect'] = `https://accounts.spotify.com/authorize?response_type=code&client_id=${process.env.SPOTIFY_API_ID}${(scopes ? '&scope=' + encodeURIComponent(scopes) : '')}&state=${state}&redirect_uri=${process.env.REDIRECT_URI}`
 
   res.write(JSON.stringify(result))
 
   res.status(200).end()
 })
 
-app.get('/songguesser/auth', cors(corsSettings), (req, res) => {
-  spotify.authenticateUser(req, req.query.state, (err, result) => {
+app.get('/songguesser/auth', cors(corsSettings), (req: { query: { state: string } }, res: { status: (arg0: number) => { (): any; new(): any; end: { (): void; new(): any } }; write: (arg0: string) => void }) => {
+  spotify.authenticateUser(req, req.query.state, (err: any, result: { SPOTIFY_USER_AUTHORIZATION: any; SPOTIFY_USER_ACCESS: any; SPOTIFY_USER_ACCESS_EXPIRES_IN: any; SPOTIFY_USER_REFRESH_TOKEN: any }) => {
     if (err) {
       res.status(401).end()
       return
     }
     const response = {}
 
-    response.SPOTIFY_USER_AUTHORIZATION = result.SPOTIFY_USER_AUTHORIZATION
-    response.SPOTIFY_USER_ACCESS = result.SPOTIFY_USER_ACCESS
-    response.SPOTIFY_USER_ACCESS_EXPIRES_IN = result.SPOTIFY_USER_ACCESS_EXPIRES_IN
-    response.SPOTIFY_USER_REFRESH_TOKEN = result.SPOTIFY_USER_REFRESH_TOKEN
+    response['SPOTIFY_USER_AUTHORIZATION'] = result.SPOTIFY_USER_AUTHORIZATION
+    response['SPOTIFY_USER_ACCESS'] = result.SPOTIFY_USER_ACCESS
+    response['SPOTIFY_USER_ACCESS_EXPIRES_IN'] = result.SPOTIFY_USER_ACCESS_EXPIRES_IN
+    response['SPOTIFY_USER_REFRESH_TOKEN'] = result.SPOTIFY_USER_REFRESH_TOKEN
     res.write(JSON.stringify(response))
     res.status(200).end()
   })
 })
 
-app.get('/redirect', cors(corsSettings), (req, res) => {
+app.get('/redirect', cors(corsSettings), (req: { query: { destination: any; origin: any }; ip: string }, res: { redirect: (arg0: number, arg1: any) => void; end: () => void; write: (arg0: string) => void; send: () => void }) => {
   if (req.query.destination !== undefined) {
     const destination = req.query.destination
     const origin = req.query.origin
@@ -145,11 +145,11 @@ app.get('/redirect', cors(corsSettings), (req, res) => {
       result.on('data', (d) => {
         result = JSON.parse(d.toString())
 
-        const city = result.city
-        const country = result.country
-        const region = result.region
+        const city = result['city']
+        const country = result['country']
+        const region = result['region']
 
-        pool.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Math.floor(new Date() / 1000)}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err) => {
+        pool.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Math.floor(new Date().getTime() / 1000)}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err: any) => {
           if (err) throw err
         })
 
@@ -205,7 +205,7 @@ app.get('/redirect', cors(corsSettings), (req, res) => {
   }
 })
 
-app.get('/redirect/generate', cors(corsSettings), (req, res) => {
+app.get('/redirect/generate', cors(corsSettings), (req: { query: { destination: string | number | boolean; origin: string | number | boolean } }, res: { write: (arg0: string) => void; send: () => void; end: () => void }) => {
   res.write(`https://api.julianvos.nl/redirect?destination=${encodeURIComponent(req.query.destination)}&origin=${encodeURIComponent(req.query.origin)}`)
   res.send()
   res.end()

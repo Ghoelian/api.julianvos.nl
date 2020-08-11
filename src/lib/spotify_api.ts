@@ -1,12 +1,9 @@
-const request = require('request')
+import request = require('request')
 
 /**
  * Refresh a user's access token.
- *
- * @param {any} req Request including all headers, cookies, and request body.
- * @param {*} callback Callback function to fire when calling callback().
  */
-const refresh = (req, callback) => {
+export const refresh = (req: any, callback: any) => {
   const result = {}
 
   request({
@@ -18,13 +15,13 @@ const refresh = (req, callback) => {
     method: 'POST',
     body: `grant_type=refresh_token&refresh_token=${req.body.spotify_user_refresh_token}`
   },
-  (err, response, body) => {
+  (err: any, response: any, body: string) => {
     if (err || JSON.parse(body).error) {
       console.error(`[Server] Error while trying to refresh token.\n\t${err || JSON.parse(body).error.message}`)
       callback(err, null)
     } else {
-      result.SPOTIFY_USER_ACCESS = JSON.parse(body).access_token
-      result.SPOTIFY_USER_ACCESS_EXPIRES_IN = JSON.parse(body).expires_in
+      result['SPOTIFY_USER_ACCESS'] = JSON.parse(body).access_token
+      result['SPOTIFY_USER_ACCESS_EXPIRES_IN'] = JSON.parse(body).expires_in
       callback(null, result)
       console.log('[Server] Token refresh succeeded.')
     }
@@ -33,18 +30,15 @@ const refresh = (req, callback) => {
 
 /**
  * Get a user's details, including their display name and ID, used later for calling other API functions.
- *
- * @param {any} req Request including all headers, cookies, and request body.
- * @param {function} callback Callback function to fire when calling callback().
  */
-const getUserDetails = (req, callback) => {
+export const getUserDetails = (req: any, callback: any) => {
   request({
     url: 'https://api.spotify.com/v1/me',
     headers: {
       Authorization: `Bearer ${req.body.spotify_user_access}`
     },
     method: 'GET'
-  }, (err, response, body) => {
+  }, (err: any, response: any, body: string) => {
     if (err || JSON.parse(body).error) {
       console.error(`[Server] Error while trying to get user details.\n\t${err || JSON.parse(body).error.message}`)
       callback(err || JSON.parse(body).error.message, null)
@@ -56,11 +50,8 @@ const getUserDetails = (req, callback) => {
 
 /**
  * Get a user's playlists.
- *
- * @param {any} req Request including all headers, cookies, and request body.
- * @param {function} callback Callback function to fire when calling callback().
  */
-const getUserPlaylists = (req, callback) => {
+export const getUserPlaylists = (req: { body: { spotify_user_access: any } }, callback: { (err: any, data: any): void; (arg0: any, arg1: any[]): void }) => {
   let total = 0
   let whole = 0
   let remainder = 0
@@ -74,7 +65,7 @@ const getUserPlaylists = (req, callback) => {
         Authorization: `Bearer ${req.body.spotify_user_access}`
       },
       method: 'GET'
-    }, (err, response, body) => {
+    }, (err: any, response: any, body: string) => {
       if (err || JSON.parse(body).error) {
         console.error(`[Server] Error while trying to get initial playlist.\n\t${err || JSON.parse(body).error.message}`)
         reject(err || JSON.parse(body).error.message)
@@ -86,7 +77,7 @@ const getUserPlaylists = (req, callback) => {
         resolve()
       }
     })
-  }).then((result) => {
+  }).then(() => {
     new Promise((resolve, reject) => {
       for (let i = 0; i < whole; i++) { // Execute the request as many times as 50 fits in the total amount.
         request({
@@ -95,7 +86,7 @@ const getUserPlaylists = (req, callback) => {
             Authorization: `Bearer ${req.body.spotify_user_access}`
           },
           method: 'GET'
-        }, (err, response, body) => {
+        }, (err: any, response: any, body: string) => {
           if (err || JSON.parse(body).error) {
             console.error(`[Server] Error while trying to get playlists.\n\t${err || JSON.parse(body).error.message}`)
             reject(err || JSON.parse(body).error.message)
@@ -116,7 +107,7 @@ const getUserPlaylists = (req, callback) => {
       if (whole === 0) { // If the user has less than 50 playlists, resolve the promise without looping.
         resolve()
       }
-    }).then((result) => {
+    }).then(() => {
       new Promise((resolve, reject) => {
         request({ // Get the remaining playlists.
           url: `https://api.spotify.com/v1/me/playlists?limit=${remainder}&offset=${offset}`,
@@ -124,7 +115,7 @@ const getUserPlaylists = (req, callback) => {
             Authorization: `Bearer ${req.body.spotify_user_access}`
           },
           method: 'GET'
-        }, (err, result, body) => {
+        }, (err: any, result: any, body: string) => {
           if (err || JSON.parse(body).error) {
             console.error(`[Server] Error while trying to get remaining playlists.\n\t${err || JSON.parse(body).error.message}`)
             reject(err || JSON.parse(body).error.message)
@@ -138,7 +129,7 @@ const getUserPlaylists = (req, callback) => {
             resolve()
           }
         })
-      }).then((result) => {
+      }).then(() => {
         callback(null, items)
       }).catch((error) => {
         callback(error, null)
@@ -154,11 +145,8 @@ const getUserPlaylists = (req, callback) => {
  *
  * Basically the same as getUserPlaylists(), but gets the songs instead.
  * See comments in getUserPlaylists() for an explanation to the loops and stuff.
- *
- * @param {any} req Request including all headers, cookies, and request body.
- * @param {function} callback Callback function to fire when calling callback().
  */
-const getPlaylistSongs = (req, callback) => {
+export const getPlaylistSongs = (req: { query: { playlist: any }; body: { spotify_user_access: any } }, callback: { (err: any, data: any): void; (arg0: any, arg1: any[]): void }) => {
   let total = 0
   let whole = 0
   let remainder = 0
@@ -172,7 +160,7 @@ const getPlaylistSongs = (req, callback) => {
         Authorization: `Bearer ${req.body.spotify_user_access}`
       },
       method: 'GET'
-    }, (err, response, body) => {
+    }, (err: any, response: any, body: string) => {
       if (err || JSON.parse(body).error) {
         console.error(`[Server] Error while trying to get playlist's initial song.\n\t${err || JSON.parse(body).error.message}`)
         reject(err || JSON.parse(body).error.message)
@@ -183,7 +171,7 @@ const getPlaylistSongs = (req, callback) => {
 
       resolve()
     })
-  }).then((result) => {
+  }).then(() => {
     new Promise((resolve, reject) => {
       for (let i = 0; i < whole; i++) {
         request({
@@ -192,7 +180,7 @@ const getPlaylistSongs = (req, callback) => {
             Authorization: `Bearer ${req.body.spotify_user_access}`
           },
           method: 'GET'
-        }, (err, response, body) => {
+        }, (err: any, response: any, body: string) => {
           if (err || JSON.parse(body).error) {
             console.error(`[Server] Error while trying to get playlist's songs.\n\t${err || JSON.parse(body).error.message}`)
             reject(err || JSON.parse(body).error.message)
@@ -214,7 +202,7 @@ const getPlaylistSongs = (req, callback) => {
       if (whole === 0) {
         resolve()
       }
-    }).then((result) => {
+    }).then(() => {
       new Promise((resolve, reject) => {
         if (remainder !== 0) {
           request({
@@ -223,7 +211,7 @@ const getPlaylistSongs = (req, callback) => {
               Authorization: `Bearer ${req.body.spotify_user_access}`
             },
             method: 'GET'
-          }, (err, result, body) => {
+          }, (err: any, result: any, body: string) => {
             if (err || JSON.parse(body).error) {
               console.error(`[Server] Error while trying to get playlist's remaining songs.\n\t${err || JSON.parse(body).error.message}`)
               reject(err || JSON.parse(body).error.message)
@@ -239,7 +227,7 @@ const getPlaylistSongs = (req, callback) => {
         } else {
           resolve()
         }
-      }).then((result) => {
+      }).then(() => {
         callback(null, items)
       }).catch((error) => {
         callback(error, null)
@@ -254,15 +242,11 @@ const getPlaylistSongs = (req, callback) => {
 
 /**
  * Get an access token for the user, using the authorization token provided by the Spotif API on the client-side.
- *
- * @param {any} req Request including all headers, cookies, and request body.
- * @param {string} state State parameter used to verify the request to the Spotify API didn't get tampered with.
- * @param {function} callback Callback function to fire when calling callback().
  */
-const authenticateUser = (req, state, callback) => {
+export const authenticateUser = (req: any, state: string, callback: any) => {
   if (req.query.state === state) {
     const result = {}
-    result.SPOTIFY_USER_AUTHORIZATION = req.query.code
+    result['SPOTIFY_USER_AUTHORIZATION'] = req.query.code
 
     request({
       url: 'https://accounts.spotify.com/api/token',
@@ -273,16 +257,16 @@ const authenticateUser = (req, state, callback) => {
       method: 'POST',
       body: `grant_type=authorization_code&code=${req.query.code}&redirect_uri=${process.env.REDIRECT_URI}`
     },
-    (err, response, body) => {
+    (err: any, response: any, body: string) => {
       if (err || JSON.parse(body).err) {
         console.error(`[Server] Error while trying to get access token.\n\t${err || JSON.parse(body).error + JSON.parse(body).error.message}`)
         callback(err || JSON.parse(body).error.message, null)
       } else {
         const parsedBody = JSON.parse(body)
 
-        result.SPOTIFY_USER_ACCESS = parsedBody.access_token
-        result.SPOTIFY_USER_ACCESS_EXPIRES_IN = parsedBody.expires_in
-        result.SPOTIFY_USER_REFRESH_TOKEN = parsedBody.refresh_token
+        result['SPOTIFY_USER_ACCESS'] = parsedBody.access_token
+        result['SPOTIFY_USER_ACCESS_EXPIRES_IN'] = parsedBody.expires_in
+        result['SPOTIFY_USER_REFRESH_TOKEN'] = parsedBody.refresh_token
 
         callback(null, result)
       }
@@ -293,9 +277,3 @@ const authenticateUser = (req, state, callback) => {
     callback(err, null)
   }
 }
-
-exports.getUserDetails = getUserDetails
-exports.getUserPlaylists = getUserPlaylists
-exports.getPlaylistSongs = getPlaylistSongs
-exports.authenticateUser = authenticateUser
-exports.refresh = refresh
