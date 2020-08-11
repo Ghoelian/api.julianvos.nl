@@ -1,6 +1,8 @@
+[![Build Status](https://jenkins.julianvos.nl/buildStatus/icon?job=api.julianvos.nl)](https://jenkins.julianvos.nl/job/api.julianvos.nl/)
+
 # About
-This is my API, now just hosting all necessary server-side code for my [song guessing game](https://github.com/Ghoelian/songguesser.julianvos.nl).
-Eventually, I'll move my [URL "shortener"](https://github.com/Ghoelian/shortener.julianvos.nl) here as well.
+This is my API, hosting all server-side code for my [song guessing game](https://github.com/Ghoelian/songguesser.julianvos.nl), as well as my
+[URL "shortener"](https://github.com/Ghoelian/shortener.julianvos.nl).
 
 # TODO:
 - Check response body for error messages for Spotify API calls
