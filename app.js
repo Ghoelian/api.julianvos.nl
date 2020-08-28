@@ -31,8 +31,4 @@ app.options('*', cors(corsSettings))
 app.use('/songguesser', songguesserRouter)
 app.use('/redirect', redirectRouter)
 
-const listener = app.listen(process.env.PORT, () => {
-  console.log(`[Server] Listening on port ${listener.address().port}`)
-})
-
 module.exports = app
