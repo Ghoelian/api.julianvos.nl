@@ -1,29 +1,26 @@
 {
   "name": "songguesser.julianvos.nl",
   "version": "1.0.0",
-  "description": "Song guesser game that uses your own Spotify playlists",
+  "description": "API used by my websites.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ghoelian/songguesser.julianvos.nl.git"
+    "url": "git+https://github.com/Ghoelian/api.julianvos.nl.git"
   },
   "keywords": [
-    "spotify",
-    "song",
-    "game",
-    "speed"
+    "api",
+    "rest"
   ],
   "author": "Julian Vos",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Ghoelian/songguesser.julianvos.nl/issues"
+    "url": "https://github.com/Ghoelian/api.julianvos.nl/issues"
   },
-  "homepage": "https://github.com/Ghoelian/songguesser.julianvos.nl#readme",
+  "homepage": "https://github.com/Ghoelian/api.julianvos.nl#readme",
   "dependencies": {
-    "@types/node": "^14.0.27",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
