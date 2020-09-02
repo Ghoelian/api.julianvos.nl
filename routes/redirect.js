@@ -1,30 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const https = require('https')
-const mysql = require('mysql')
+const sql = require('../lib/sql')
 const discord = require('discord.js')
-
-const pool = mysql.createPool({
-  connectionLimit: 10,
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB
-})
-
-const discordClient = new discord.Client()
-
-let notificationChannel
-let errorChannel
-
-require('dotenv').config() // Load the .env file that should be put in the root of this project. See README.md for variables to include
-
-discordClient.on('ready', () => {
-  notificationChannel = discordClient.channels.cache.find(channel => channel.name === 'notifications')
-  errorChannel = discordClient.channels.cache.find(channel => channel.name === 'errors')
-})
-
-discordClient.login(process.env.DISCORD_TOKEN)
+const _discord = require('../lib/discord')
 
 router.get('/', (req, res) => {
   if (req.query.destination !== undefined) {
@@ -44,11 +23,9 @@ router.get('/', (req, res) => {
         const country = result.country
         const region = result.region
 
-        pool.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Math.floor(new Date().getTime() / 1000)}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err) => {
-          if (err) throw err
-        })
+        sql.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Math.floor(new Date().getTime() / 1000)}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`)
 
-        notificationChannel.send(new discord.MessageEmbed()
+        _discord.send('notification', new discord.MessageEmbed()
           .setTitle(`New click from ${origin}`)
           .setColor(0x00FF00)
           .addFields(
@@ -61,7 +38,7 @@ router.get('/', (req, res) => {
           ))
       })
     }).on('error', (err) => {
-      errorChannel.send(new discord.MessageEmbed()
+      discord.send('error', new discord.MessageEmbed()
         .setTitle('Error')
         .setColor(0xFF0000)
         .addFields(

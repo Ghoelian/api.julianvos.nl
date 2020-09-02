@@ -3,12 +3,12 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 
+require('dotenv').config() // Load the .env file that should be put in the root of this project. See README.md for variables to include
+
 const songguesserRouter = require('./routes/songguesser')
 const redirectRouter = require('./routes/redirect')
 
 const app = express()
-
-require('dotenv').config() // Load the .env file that should be put in the root of this project. See README.md for variables to include
 
 const corsSettings = {
   origin: process.env.CORS_ORIGIN,
