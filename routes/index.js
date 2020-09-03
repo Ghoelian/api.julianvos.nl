@@ -35,7 +35,7 @@ router.get('/', (req, res) => {
         <p>
           The redirect route of this API only stores your IP address. Everything else is derived from either the URL structure or the IP address itself.<br />
           The API retrieves a very broad approximation of the location of the IP address form <a href="https://ipinfo.io">IPinfo</a>.<br />
-          Here is all of the data we have collected from your current IP address.
+          Here is all of the data we have collected from your current IP address, ${req.ip.substr(0, 7) === '::ffff:' ? req.ip.substr(7) : req.ip}.
         </p>
         <table>
         <tr>
