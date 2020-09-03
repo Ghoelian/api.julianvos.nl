@@ -23,6 +23,7 @@ router.get('/', (req, res) => {
       }
 
       table, th, td {
+        text-align: center;
         border: 1px solid black;
         border-collapse: collapse;
       }
@@ -71,7 +72,7 @@ router.get('/', (req, res) => {
       `)
     })
 
-    res.write(`</table>
+    res.write(`</table><br />
         <footer>
           <a href="https://julianvos.nl/privacy_policy">Privacy Policy</a><br/>
           <a href="https://julianvos.nl/terms_of_service">Terms of Service</a>
