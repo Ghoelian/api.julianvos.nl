@@ -23,7 +23,9 @@ router.get('/', (req, res) => {
         const country = result.country
         const region = result.region
 
-        sql.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Math.floor(new Date().getTime() / 1000)}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`)
+        sql.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Math.floor(new Date().getTime() / 1000)}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err, result) => {
+          if (err) throw err
+        })
 
         _discord.send('notification', new discord.MessageEmbed()
           .setTitle(`New click from ${origin}`)

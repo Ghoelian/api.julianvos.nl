@@ -1,5 +1,5 @@
 const express = require('express')
-const spotify = require('./spotify_api')
+const spotify = require('../lib/spotify')
 const uuidv4 = require('uuid/v4')
 
 const router = express.Router()

@@ -7,6 +7,7 @@ require('dotenv').config() // Load the .env file that should be put in the root 
 
 const songguesserRouter = require('./routes/songguesser')
 const redirectRouter = require('./routes/redirect')
+const indexRouter = require('./routes/index')
 
 const app = express()
 
@@ -28,6 +29,7 @@ app.use(cors(corsSettings)) // Apply CORS settings to all requests.
 
 app.options('*', cors(corsSettings))
 
+app.use('/', indexRouter)
 app.use('/songguesser', songguesserRouter)
 app.use('/redirect', redirectRouter)
 
