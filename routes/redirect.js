@@ -9,6 +9,12 @@ router.get('/', (req, res) => {
   if (req.query.destination !== undefined) {
     const destination = req.query.destination
     const origin = req.query.origin
+    const date = req.query.date !== undefined ? new Date(req.query.date * 1000) : new Date()
+    const year = date.getFullYear()
+    const month = ('0' + (date.getMonth() + 1)).substr(-2)
+    const day = ('0' + date.getDate()).substr(-2)
+    const hours = date.getHours()
+    const minutes = ('0' + date.getMinutes()).substr(-2)
 
     res.redirect(302, destination)
     res.end()
@@ -30,22 +36,37 @@ router.get('/', (req, res) => {
         _discord.send('notification', new discord.MessageEmbed()
           .setTitle(`New click from ${origin}`)
           .setColor(0x00FF00)
-          .addFields(
-            { name: 'IP', value: ip },
-            { name: 'Destination', value: destination },
-            { name: 'Origin', value: origin },
-            { name: 'City', value: city },
-            { name: 'Region', value: region },
-            { name: 'Country', value: country }
-          ))
+          .addFields({
+            name: 'Date',
+            value: `${day}/${month}/${year} ${hours}:${minutes}`
+          }, {
+            name: 'IP',
+            value: ip
+          }, {
+            name: 'Destination',
+            value: destination
+          }, {
+            name: 'Origin',
+            value: origin
+          }, {
+            name: 'City',
+            value: city
+          }, {
+            name: 'Region',
+            value: region
+          }, {
+            name: 'Country',
+            value: country
+          }))
       })
     }).on('error', (err) => {
       discord.send('error', new discord.MessageEmbed()
         .setTitle('Error')
         .setColor(0xFF0000)
-        .addFields(
-          { name: 'Error', value: err }
-        )
+        .addFields({
+          name: 'Error',
+          value: err
+        })
       )
 
       throw err
