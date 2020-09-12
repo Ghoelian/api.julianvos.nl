@@ -20,7 +20,10 @@ router.get('/', (req, res) => {
     let minutes = null
 
     if (req.query.date !== undefined) {
-      date = new Date(req.query.date)
+      // req.query.date === 1599923986910
+      date = new Date(parseInt(req.query.date))
+      console.log(date)
+
       year = date.getFullYear()
       month = ('0' + (date.getMonth() + 1)).substr(-2)
       day = ('0' + date.getDate()).substr(-2)
