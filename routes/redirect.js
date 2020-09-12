@@ -8,17 +8,18 @@ const _discord = require('../lib/discord')
 router.get('/', (req, res) => {
   if (req.query.destination !== undefined) {
     const destination = req.query.destination
+
+    res.redirect(302, destination)
+    res.end()
+
     const origin = req.query.origin
-    const date = req.query.date !== undefined ? new Date(req.query.date * 1000) : new Date()
+    const date = req.query.date !== undefined && (new Date(req.query.date))
     const year = date.getFullYear()
     const month = ('0' + (date.getMonth() + 1)).substr(-2)
     const day = ('0' + date.getDate()).substr(-2)
     const hours = date.getHours()
     const minutes = ('0' + date.getMinutes()).substr(-2)
-
-    res.redirect(302, destination)
-    res.end()
-
+    const fullDate = req.query.date !== undefined ? `${day}/${month}/${year} ${hours}:${minutes}` : 'No date in URL.'
     const ip = req.ip.substr(0, 7) === '::ffff:' ? req.ip.substr(7) : req.ip
 
     https.get(`https://ipinfo.io/${ip}/json?token=${process.env.IPINFO_TOKEN}`, (result) => {
@@ -38,7 +39,7 @@ router.get('/', (req, res) => {
           .setColor(0x00FF00)
           .addFields({
             name: 'Date',
-            value: `${day}/${month}/${year} ${hours}:${minutes}`
+            value: `${fullDate}`
           }, {
             name: 'IP',
             value: ip
