@@ -12,13 +12,23 @@ router.get('/', (req, res) => {
     res.redirect(302, destination)
     res.end()
 
+    let date = null
+    let year = null
+    let month = null
+    let day = null
+    let hours = null
+    let minutes = null
+
+    if (req.query.date !== undefined) {
+      date = new Date(req.query.date)
+      year = date.getFullYear()
+      month = ('0' + (date.getMonth() + 1)).substr(-2)
+      day = ('0' + date.getDate()).substr(-2)
+      hours = date.getHours()
+      minutes = ('0' + date.getMinutes()).substr(-2)
+    }
+
     const origin = req.query.origin
-    const date = req.query.date !== undefined && (new Date(req.query.date))
-    const year = date.getFullYear()
-    const month = ('0' + (date.getMonth() + 1)).substr(-2)
-    const day = ('0' + date.getDate()).substr(-2)
-    const hours = date.getHours()
-    const minutes = ('0' + date.getMinutes()).substr(-2)
     const fullDate = req.query.date !== undefined ? `${day}/${month}/${year} ${hours}:${minutes}` : 'No date in URL.'
     const ip = req.ip.substr(0, 7) === '::ffff:' ? req.ip.substr(7) : req.ip
 
