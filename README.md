@@ -1,4 +1,5 @@
 [![Build Status](https://jenkins.julianvos.nl/buildStatus/icon?job=api.julianvos.nl)](https://jenkins.julianvos.nl/job/api.julianvos.nl/)
+[![Maintainability](https://api.codeclimate.com/v1/badges/b116c4ec8def1a60e5df/maintainability)](https://codeclimate.com/github/Ghoelian/api.julianvos.nl/maintainability)
 
 # About
 This is my API, hosting all server-side code for my [song guessing game](https://github.com/Ghoelian/songguesser.julianvos.nl), as well as my
