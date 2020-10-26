@@ -2,7 +2,7 @@
 
 # About
 This is my API, hosting all server-side code for my [song guessing game](https://github.com/Ghoelian/songguesser.julianvos.nl), as well as my
-URL redirecting script (now integrated directly in this script).
+URL redirecting script.
 
 # TODO:
 - Check response body for error messages for Spotify API calls
