@@ -47,44 +47,44 @@ router.get('/', (req, res) => {
           if (err) throw err
         })
 
-//         _discord.send('notification', new discord.MessageEmbed()
-//           .setTitle(`New click from ${origin}`)
-//           .setColor(0x00FF00)
-//           .addFields({
-//             name: 'Date',
-//             value: `${fullDate}`
-//           }, {
-//             name: 'IP',
-//             value: ip
-//           }, {
-//             name: 'Destination',
-//             value: destination
-//           }, {
-//             name: 'Origin',
-//             value: origin
-//           }, {
-//             name: 'City',
-//             value: city
-//           }, {
-//             name: 'Region',
-//             value: region
-//           }, {
-//             name: 'Country',
-//             value: country
-//           }))
-//       })
-//     }).on('error', (err) => {
-//       discord.send('error', new discord.MessageEmbed()
-//         .setTitle('Error')
-//         .setColor(0xFF0000)
-//         .addFields({
-//           name: 'Error',
-//           value: err
-//         })
-//       )
-// 
-//       throw err
-//     })
+        // _discord.send('notification', new discord.MessageEmbed()
+        //   .setTitle(`New click from ${origin}`)
+        //   .setColor(0x00FF00)
+        //   .addFields({
+        //     name: 'Date',
+        //     value: `${fullDate}`
+        //   }, {
+        //     name: 'IP',
+        //     value: ip
+        //   }, {
+        //     name: 'Destination',
+        //     value: destination
+        //   }, {
+        //     name: 'Origin',
+        //     value: origin
+        //   }, {
+        //     name: 'City',
+        //     value: city
+        //   }, {
+        //     name: 'Region',
+        //     value: region
+        //   }, {
+        //     name: 'Country',
+        //     value: country
+        //   }))
+      })
+    }).on('error', (err) => {
+      discord.send('error', new discord.MessageEmbed()
+        .setTitle('Error')
+        .setColor(0xFF0000)
+        .addFields({
+          name: 'Error',
+          value: err
+        })
+      )
+
+      throw err
+    })
   } else {
     res.write(`
     <!DOCTYPE html>
