@@ -82,9 +82,9 @@ router.get('/', (req, res) => {
 //           value: err
 //         })
 //       )
-
-      throw err
-    })
+// 
+//       throw err
+//     })
   } else {
     res.write(`
     <!DOCTYPE html>
