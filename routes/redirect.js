@@ -35,56 +35,56 @@ router.get('/', (req, res) => {
     const fullDate = req.query.date !== undefined ? `${day}/${month}/${year} ${hours}:${minutes}` : 'No date in URL.'
     const ip = req.ip.substr(0, 7) === '::ffff:' ? req.ip.substr(7) : req.ip
 
-    https.get(`https://ipinfo.io/${ip}/json?token=${process.env.IPINFO_TOKEN}`, (result) => {
-      result.on('data', (d) => {
-        result = JSON.parse(d.toString())
+    // https.get(`https://ipinfo.io/${ip}/json?token=${process.env.IPINFO_TOKEN}`, (result) => {
+    //   result.on('data', (d) => {
+    //     result = JSON.parse(d.toString())
 
-        const city = result.city
-        const country = result.country
-        const region = result.region
+    //     const city = result.city
+    //     const country = result.country
+    //     const region = result.region
 
-        sql.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Math.floor(new Date().getTime() / 1000)}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err, result) => {
-          if (err) throw err
-        })
+    //     sql.query(`INSERT INTO shortener.tracking (date, destination, origin, ip, city, country, region) VALUES ('${Math.floor(new Date().getTime() / 1000)}', '${destination}', '${origin}', '${ip}', '${city}', '${country}', '${region}')`, (err, result) => {
+    //       if (err) throw err
+    //     })
 
-        // _discord.send('notification', new discord.MessageEmbed()
-        //   .setTitle(`New click from ${origin}`)
-        //   .setColor(0x00FF00)
-        //   .addFields({
-        //     name: 'Date',
-        //     value: `${fullDate}`
-        //   }, {
-        //     name: 'IP',
-        //     value: ip
-        //   }, {
-        //     name: 'Destination',
-        //     value: destination
-        //   }, {
-        //     name: 'Origin',
-        //     value: origin
-        //   }, {
-        //     name: 'City',
-        //     value: city
-        //   }, {
-        //     name: 'Region',
-        //     value: region
-        //   }, {
-        //     name: 'Country',
-        //     value: country
-        //   }))
-      })
-    }).on('error', (err) => {
-      discord.send('error', new discord.MessageEmbed()
-        .setTitle('Error')
-        .setColor(0xFF0000)
-        .addFields({
-          name: 'Error',
-          value: err
-        })
-      )
+    //     // _discord.send('notification', new discord.MessageEmbed()
+    //     //   .setTitle(`New click from ${origin}`)
+    //     //   .setColor(0x00FF00)
+    //     //   .addFields({
+    //     //     name: 'Date',
+    //     //     value: `${fullDate}`
+    //     //   }, {
+    //     //     name: 'IP',
+    //     //     value: ip
+    //     //   }, {
+    //     //     name: 'Destination',
+    //     //     value: destination
+    //     //   }, {
+    //     //     name: 'Origin',
+    //     //     value: origin
+    //     //   }, {
+    //     //     name: 'City',
+    //     //     value: city
+    //     //   }, {
+    //     //     name: 'Region',
+    //     //     value: region
+    //     //   }, {
+    //     //     name: 'Country',
+    //     //     value: country
+    //     //   }))
+    //   })
+    // }).on('error', (err) => {
+    //   discord.send('error', new discord.MessageEmbed()
+    //     .setTitle('Error')
+    //     .setColor(0xFF0000)
+    //     .addFields({
+    //       name: 'Error',
+    //       value: err
+    //     })
+    //   )
 
-      throw err
-    })
+    //   throw err
+    // })
   } else {
     res.write(`
     <!DOCTYPE html>
